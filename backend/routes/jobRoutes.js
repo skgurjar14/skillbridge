@@ -1,5 +1,5 @@
 import express from "express";
-import Job from "../models/job.js";
+import job from "../models/job.js";
 import nodemailer from "nodemailer";
 import User from "../models/User.js";
 
