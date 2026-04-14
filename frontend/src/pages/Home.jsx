@@ -11,7 +11,8 @@ function Home() {
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
-  const user = JSON.parse(localStorage.getItem("user"));
+  const user = JSON.parse(localStorage.getItem("user") || "null");
+
 
   // ================= LOAD JOBS =================
   const loadJobs = async () => {
@@ -21,10 +22,10 @@ function Home() {
       const jobsWithData = res.data.map((job) => ({
         ...job,
         status: job.status || "open",
-        userRating: job.userRating || 0,
+        userRating: job?.userRating ?? 0
       }));
 
-      setJobs(jobsWithData.reverse());
+      setJobs([...jobsWithData].reverse());
 
     } catch (err) {
       console.log(err);
@@ -32,9 +33,11 @@ function Home() {
     }
   };
 
+
   useEffect(() => {
     loadJobs();
   }, []);
+
 
   // ================= NEARBY =================
   const getNearby = () => {
@@ -55,7 +58,7 @@ function Home() {
           const jobsWithData = res.data.map((job) => ({
             ...job,
             status: job.status || "open",
-            userRating: job.userRating || 0,
+            userRating: job?.userRating ?? 0
           }));
 
           setJobs(jobsWithData);
@@ -70,15 +73,18 @@ function Home() {
         }
 
       },
-      () => {
+      (error) => {
+        console.log(error);
         setLoading(false);
         toast.error("Location permission denied");
       }
     );
   };
 
-  // ================= APPLY =================
+
+  // ================= APPLY JOB =================
   const applyJob = async (job) => {
+
     if (!user) return toast.warning("Please login first");
 
     try {
@@ -100,8 +106,10 @@ function Home() {
     }
   };
 
-  // ================= CANCEL =================
+
+  // ================= CANCEL JOB (FIXED) =================
   const cancelJob = async (job) => {
+
     if (!user) return toast.warning("Please login first");
 
     try {
@@ -109,9 +117,12 @@ function Home() {
       await axios.post(`${API}/api/jobs/apply`, {
         jobId: job._id,
         applicantId: user._id,
+        applicantName: user.name,
+        applicantEmail: user.email,
+        applicantPhone: user.phone
       });
 
-      toast.info("Cancelled");
+      toast.info("Application cancelled");
       loadJobs();
 
     } catch (err) {
@@ -120,8 +131,10 @@ function Home() {
     }
   };
 
+
   // ================= RATING =================
   const rateUser = async (job, rating) => {
+
     try {
 
       await axios.post(`${API}/api/jobs/rate`, {
@@ -131,9 +144,12 @@ function Home() {
 
       toast.success("Rating submitted");
 
+      // instant UI update
       setJobs((prev) =>
         prev.map((j) =>
-          j.userId === job.userId ? { ...j, userRating: rating } : j
+          j.userId === job.userId
+            ? { ...j, userRating: rating }
+            : j
         )
       );
 
@@ -143,6 +159,7 @@ function Home() {
     }
   };
 
+
   return (
     <div className="home">
 
@@ -150,9 +167,7 @@ function Home() {
 
         <h2>Find Local Services Instantly</h2>
 
-        <p>
-          Hire skilled people near you for quick jobs
-        </p>
+        <p>Hire skilled people near you for quick jobs</p>
 
         <input
           placeholder="Search service or location"
@@ -171,6 +186,7 @@ function Home() {
         {loading && <p>Loading...</p>}
 
       </div>
+
 
       <div className="jobs">
 
