@@ -1,6 +1,7 @@
 import axios from "axios";
 import "../styles/jobcard.css";
 import { useEffect, useState } from "react";
+import { API } from "../config/Api";
 
 function JobCard({
   job,
@@ -37,148 +38,102 @@ function JobCard({
     });
   }, [job]);
 
-
   // ================= Applied User =================
   const appliedUser = job.appliedUsers?.find(
     u => u.userId === user?._id
   );
 
-
   // ================= DELETE =================
   const deleteJob = async () => {
-
     if (!window.confirm("Delete this service?")) return;
 
     try {
-
-      await axios.delete(
-        `https://skillbridge-p3p8.onrender.com/${job._id}`
-      );
-
+      await axios.delete(`${API}/api/jobs/delete/${job._id}`);
       window.dispatchEvent(new Event("jobUpdated"));
-
     } catch (err) {
       console.log(err);
     }
   };
-
 
   // ================= APPLY =================
   const handleApply = async () => {
-
     try {
-
       await applyJob(job);
       window.dispatchEvent(new Event("jobUpdated"));
-
     } catch (err) {
       console.log(err);
     }
-
   };
-
 
   // ================= CANCEL =================
   const handleCancel = async () => {
-
-    if (!window.confirm("Cancel this application?")) return;
+    if (!window.confirm("Cancel application?")) return;
 
     try {
-
       await cancelJob(job);
       window.dispatchEvent(new Event("jobUpdated"));
-
     } catch (err) {
       console.log(err);
     }
-
   };
-
 
   // ================= ACCEPT =================
   const acceptUser = async () => {
     try {
-
-      await axios.post(
-        "https://skillbridge-p3p8.onrender.com",
-        {
-          jobId: job._id,
-          userId: appliedUser?.userId
-        }
-      );
+      await axios.post(`${API}/api/jobs/accept`, {
+        jobId: job._id,
+        userId: appliedUser?.userId
+      });
 
       window.dispatchEvent(new Event("jobUpdated"));
-
     } catch (err) {
       console.log(err);
     }
   };
-
 
   // ================= START =================
   const startWork = async () => {
     try {
-
-      await axios.post(
-        "https://skillbridge-p3p8.onrender.com",
-        {
-          jobId: job._id,
-          userId: user._id
-        }
-      );
+      await axios.post(`${API}/api/jobs/start`, {
+        jobId: job._id,
+        userId: user._id
+      });
 
       window.dispatchEvent(new Event("jobUpdated"));
-
     } catch (err) {
       console.log(err);
     }
   };
-
 
   // ================= COMPLETE =================
   const completeWork = async () => {
-
-    if (!window.confirm("Mark work as completed?")) return;
+    if (!window.confirm("Mark completed?")) return;
 
     try {
-
-      await axios.post(
-        "https://skillbridge-p3p8.onrender.com",
-        {
-          jobId: job._id,
-          userId: user._id
-        }
-      );
+      await axios.post(`${API}/api/jobs/complete`, {
+        jobId: job._id,
+        userId: user._id
+      });
 
       window.dispatchEvent(new Event("jobUpdated"));
-
     } catch (err) {
       console.log(err);
     }
   };
-
 
   // ================= RATING =================
   const handleRating = async (star) => {
-
     if (loading) return;
 
     setLoading(true);
-
     try {
-
       await rateUser(job, star);
       window.dispatchEvent(new Event("jobUpdated"));
-
     } catch (err) {
-
       console.log(err);
-
     }
-
     setLoading(false);
   };
-
 
   return (
     <div className="job-card">
@@ -192,22 +147,15 @@ function JobCard({
 
       <div className="job-details">
         <p><b>📍 Location:</b> {job.location}</p>
-
-        {distance && (
-          <p><b>📏 Distance:</b> {distance} km away</p>
-        )}
-
+        {distance && <p><b>📏 Distance:</b> {distance} km</p>}
         <p><b>📞 Contact:</b> {job.phone || "Not Provided"}</p>
         <p><b>👤 Posted By:</b> {job.postedBy}</p>
       </div>
 
-
       {/* ================= RATING ================= */}
       {appliedUser?.status === "completed" && (
         <div className="rating">
-          <p>
-            ⭐ {job.userRating ? job.userRating.toFixed(1) : "Rate Service"}
-          </p>
+          <p>⭐ Rate Service</p>
 
           <div className="stars">
             {[1, 2, 3, 4, 5].map((star) => (
@@ -223,7 +171,7 @@ function JobCard({
         </div>
       )}
 
-
+      {/* ================= ACTIONS ================= */}
       <div className="job-actions">
 
         {applyJob && !appliedUser && job.status === "open" && (
@@ -236,10 +184,6 @@ function JobCard({
           <button onClick={handleCancel} className="cancel-btn">
             Cancel
           </button>
-        )}
-
-        {appliedUser?.status === "applied" && (
-          <p>⏳ Waiting for approval...</p>
         )}
 
         {appliedUser?.status === "applied" && showDelete && (
@@ -256,12 +200,8 @@ function JobCard({
 
         {appliedUser?.status === "started" && (
           <button onClick={completeWork} className="complete-btn">
-            Complete Work
+            Complete
           </button>
-        )}
-
-        {appliedUser?.status === "completed" && (
-          <p>✅ Completed</p>
         )}
 
         {showDelete && (

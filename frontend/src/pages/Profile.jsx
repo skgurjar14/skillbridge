@@ -3,6 +3,8 @@ import axios from "axios";
 import { toast } from "react-toastify";
 import "../styles/profile.css";
 
+const API = "https://skillbridge-p3p8.onrender.com";
+
 function Profile() {
   const [user, setUser] = useState(null);
 
@@ -28,12 +30,13 @@ function Profile() {
   }, []);
 
   const update = async () => {
-    try {
+    if (!user) return toast.error("User not found");
 
-      setLoading(true)
+    try {
+      setLoading(true);
 
       const res = await axios.put(
-        `https://skillbridge-p3p8.onrender.com/${user._id}`,
+        `${API}/api/users/update/${user._id}`,
         {
           name,
           phone,
@@ -45,17 +48,13 @@ function Profile() {
       localStorage.setItem("user", JSON.stringify(res.data));
       window.dispatchEvent(new Event("storage"));
 
-      setLoading(false)
-
-      toast.success("Profile Updated Successfully 🎉")
+      toast.success("Profile Updated Successfully 🎉");
 
     } catch (err) {
-
       console.log(err);
+      toast.error("Update Failed");
+    } finally {
       setLoading(false);
-
-      toast.error("Update Failed")
-
     }
   };
 
@@ -70,35 +69,15 @@ function Profile() {
 
         <div className="profile-form">
 
-          <input
-            value={name}
-            placeholder="Full Name"
-            onChange={(e) => setName(e.target.value)}
-          />
+          <input value={name} onChange={(e) => setName(e.target.value)} placeholder="Full Name" />
 
-          <input
-            value={email}
-            disabled
-            placeholder="Email (cannot change)"
-          />
+          <input value={email} disabled placeholder="Email (cannot change)" />
 
-          <input
-            value={phone}
-            placeholder="Phone Number"
-            onChange={(e) => setPhone(e.target.value)}
-          />
+          <input value={phone} onChange={(e) => setPhone(e.target.value)} placeholder="Phone Number" />
 
-          <input
-            value={skill}
-            placeholder="Your Skill (e.g. Plumber, Electrician)"
-            onChange={(e) => setSkill(e.target.value)}
-          />
+          <input value={skill} onChange={(e) => setSkill(e.target.value)} placeholder="Skill" />
 
-          <input
-            value={location}
-            placeholder="Location"
-            onChange={(e) => setLocation(e.target.value)}
-          />
+          <input value={location} onChange={(e) => setLocation(e.target.value)} placeholder="Location" />
 
           <button onClick={update} disabled={loading}>
             {loading ? "Updating..." : "Update Profile"}

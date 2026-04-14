@@ -2,19 +2,21 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import JobCard from "../components/Jobcard";
+import { API } from "../config/Api";
 import "../styles/home.css";
 
 function Home() {
+
   const [jobs, setJobs] = useState([]);
   const [search, setSearch] = useState("");
   const [loading, setLoading] = useState(false);
 
   const user = JSON.parse(localStorage.getItem("user"));
 
-  // ================= Load Jobs =================
+  // ================= LOAD JOBS =================
   const loadJobs = async () => {
     try {
-      const res = await axios.get("https://skillbridge-p3p8.onrender.com");
+      const res = await axios.get(`${API}/api/jobs/all`);
 
       const jobsWithData = res.data.map((job) => ({
         ...job,
@@ -22,7 +24,7 @@ function Home() {
         userRating: job.userRating || 0,
       }));
 
-      setJobs([...jobsWithData].reverse());
+      setJobs(jobsWithData.reverse());
 
     } catch (err) {
       console.log(err);
@@ -34,22 +36,21 @@ function Home() {
     loadJobs();
   }, []);
 
-  // ================= Nearby Jobs =================
+  // ================= NEARBY =================
   const getNearby = () => {
-    setLoading(true);
 
+    setLoading(true);
     toast.info("Finding nearby services...");
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
+
         try {
-          const res = await axios.post(
-            "http://localhost:5000/api/jobs/nearby",
-            {
-              latitude: position.coords.latitude,
-              longitude: position.coords.longitude,
-            }
-          );
+
+          const res = await axios.post(`${API}/api/jobs/nearby`, {
+            latitude: position.coords.latitude,
+            longitude: position.coords.longitude,
+          });
 
           const jobsWithData = res.data.map((job) => ({
             ...job,
@@ -67,24 +68,22 @@ function Home() {
           setLoading(false);
           toast.error("Failed to load nearby services");
         }
+
       },
-      (error) => {
-        console.log(error);
+      () => {
         setLoading(false);
         toast.error("Location permission denied");
       }
     );
   };
 
-  // ================= APPLY JOB =================
+  // ================= APPLY =================
   const applyJob = async (job) => {
-    if (!user) {
-      toast.warning("Please login first");
-      return;
-    }
+    if (!user) return toast.warning("Please login first");
 
     try {
-      await axios.post("http://localhost:5000/api/jobs/apply", {
+
+      await axios.post(`${API}/api/jobs/apply`, {
         jobId: job._id,
         applicantName: user.name,
         applicantEmail: user.email,
@@ -92,34 +91,27 @@ function Home() {
         applicantId: user._id,
       });
 
-      toast.success("Application sent successfully");
-
+      toast.success("Applied successfully");
       loadJobs();
 
     } catch (err) {
       console.log(err);
-      toast.error("Application failed");
+      toast.error("Apply failed");
     }
   };
 
-  // ================= CANCEL JOB =================
+  // ================= CANCEL =================
   const cancelJob = async (job) => {
-    if (!user) {
-      toast.warning("Please login first");
-      return;
-    }
+    if (!user) return toast.warning("Please login first");
 
     try {
-      await axios.post("http://localhost:5000/api/jobs/apply", {
+
+      await axios.post(`${API}/api/jobs/apply`, {
         jobId: job._id,
-        applicantName: user.name,
-        applicantEmail: user.email,
-        applicantPhone: user.phone,
         applicantId: user._id,
       });
 
-      toast.info("Application cancelled");
-
+      toast.info("Cancelled");
       loadJobs();
 
     } catch (err) {
@@ -131,12 +123,13 @@ function Home() {
   // ================= RATING =================
   const rateUser = async (job, rating) => {
     try {
-      await axios.post("http://localhost:5000/api/jobs/rate", {
+
+      await axios.post(`${API}/api/jobs/rate`, {
         userId: job.userId,
         rating,
       });
 
-      toast.success("rating succes");
+      toast.success("Rating submitted");
 
       setJobs((prev) =>
         prev.map((j) =>
@@ -152,37 +145,39 @@ function Home() {
 
   return (
     <div className="home">
+
       <div className="hero">
+
         <h2>Find Local Services Instantly</h2>
 
         <p>
-          Hire skilled people near you for quick jobs like electrician,
-          cleaning, repair & more
+          Hire skilled people near you for quick jobs
         </p>
 
         <input
-          placeholder="Search service or location (e.g. Plumber Bhopal)"
+          placeholder="Search service or location"
           className="search"
           onChange={(e) => setSearch(e.target.value)}
         />
 
         <button className="nearby-btn" onClick={getNearby}>
-          📍 Nearby Services
+          📍 Nearby
         </button>
 
         <button className="nearby-btn" onClick={loadJobs}>
-          🌍 All Services
+          🌍 All
         </button>
 
-        {loading && <p>Finding Nearby Services...</p>}
+        {loading && <p>Loading...</p>}
+
       </div>
 
       <div className="jobs">
+
         {jobs
-          .filter(
-            (job) =>
-              job?.title?.toLowerCase().includes(search.toLowerCase()) ||
-              job?.location?.toLowerCase().includes(search.toLowerCase())
+          .filter(job =>
+            job?.title?.toLowerCase().includes(search.toLowerCase()) ||
+            job?.location?.toLowerCase().includes(search.toLowerCase())
           )
           .map((job) => (
             <JobCard
@@ -194,7 +189,9 @@ function Home() {
               user={user}
             />
           ))}
+
       </div>
+
     </div>
   );
 }
