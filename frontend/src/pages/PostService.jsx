@@ -58,7 +58,7 @@ return
 
 try{
 
-await axios.post("http://localhost:5000/api/jobs/post",{
+await axios.post("https://skillbridge-p3p8.onrender.com",{
 
 title,
 location,

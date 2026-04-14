@@ -27,7 +27,7 @@ try{
 toast.info("Creating account...")
 
 const res = await axios.post(
-"http://localhost:5000/api/users/register",
+"https://skillbridge-p3p8.onrender.com",
 {
 name,
 email,

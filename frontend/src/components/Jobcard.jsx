@@ -52,7 +52,7 @@ function JobCard({
     try {
 
       await axios.delete(
-        `http://localhost:5000/api/jobs/delete/${job._id}`
+        `https://skillbridge-p3p8.onrender.com/${job._id}`
       );
 
       window.dispatchEvent(new Event("jobUpdated"));
@@ -100,7 +100,7 @@ function JobCard({
     try {
 
       await axios.post(
-        "http://localhost:5000/api/jobs/accept",
+        "https://skillbridge-p3p8.onrender.com",
         {
           jobId: job._id,
           userId: appliedUser?.userId
@@ -120,7 +120,7 @@ function JobCard({
     try {
 
       await axios.post(
-        "http://localhost:5000/api/jobs/start",
+        "https://skillbridge-p3p8.onrender.com",
         {
           jobId: job._id,
           userId: user._id
@@ -143,7 +143,7 @@ function JobCard({
     try {
 
       await axios.post(
-        "http://localhost:5000/api/jobs/complete",
+        "https://skillbridge-p3p8.onrender.com",
         {
           jobId: job._id,
           userId: user._id

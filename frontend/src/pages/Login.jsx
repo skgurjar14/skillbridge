@@ -23,7 +23,7 @@ try{
 toast.info("Logging in...")
 
 const res = await axios.post(
-"http://localhost:5000/api/users/login",
+"https://skillbridge-p3p8.onrender.com",
 {
 email,
 password

@@ -33,7 +33,7 @@ function Profile() {
       setLoading(true)
 
       const res = await axios.put(
-        `http://localhost:5000/api/users/update/${user._id}`,
+        `https://skillbridge-p3p8.onrender.com/${user._id}`,
         {
           name,
           phone,

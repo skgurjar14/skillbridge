@@ -19,7 +19,7 @@ const loadMyJobs = async()=>{
 try{
 
 const res = await axios.get(
-"http://localhost:5000/api/jobs/all"
+"https://skillbridge-p3p8.onrender.com"
 )
 
 const myJobs = res.data

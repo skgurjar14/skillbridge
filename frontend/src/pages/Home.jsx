@@ -14,7 +14,7 @@ function Home() {
   // ================= Load Jobs =================
   const loadJobs = async () => {
     try {
-      const res = await axios.get("http://localhost:5000/api/jobs/all");
+      const res = await axios.get("https://skillbridge-p3p8.onrender.com");
 
       const jobsWithData = res.data.map((job) => ({
         ...job,
