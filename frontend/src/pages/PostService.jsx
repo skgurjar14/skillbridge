@@ -2,7 +2,7 @@ import axios from "axios";
 import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
 import { toast } from "react-toastify";
-import { API } from "../config/Api";
+import { API } from "../config/api.js";
 import "../styles/postservice.css";
 
 function PostService() {
