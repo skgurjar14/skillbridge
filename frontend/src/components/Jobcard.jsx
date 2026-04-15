@@ -1,7 +1,7 @@
 import axios from "axios";
 import "../styles/jobcard.css";
 import { useEffect, useState } from "react";
-import { API } from "../config/Api";
+import { API } from "../config/api";
 
 function JobCard({
   job,

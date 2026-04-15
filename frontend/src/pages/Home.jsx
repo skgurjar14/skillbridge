@@ -2,7 +2,7 @@ import axios from "axios";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 import JobCard from "../components/Jobcard";
-import { API } from "../config/Api";
+import { API } from "../config/api.js";
 import "../styles/home.css";
 
 function Home() {
