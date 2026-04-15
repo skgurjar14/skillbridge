@@ -164,6 +164,41 @@ router.post("/complete", async (req, res) => {
 });
 
 
+// ================= RATE USER =================
+router.post("/rate", async (req, res) => {
+  try {
+    const { userId, rating } = req.body;
+
+    const user = await User.findById(userId);
+
+    if (!user) {
+      return res.status(404).json({ message: "User Not Found" });
+    }
+
+    // average rating logic
+    if (!user.ratings) {
+      user.ratings = [];
+    }
+
+    user.ratings.push(rating);
+
+    const avg =
+      user.ratings.reduce((a, b) => a + b, 0) /
+      user.ratings.length;
+
+    user.rating = avg.toFixed(1);
+
+    await user.save();
+
+    res.json({ message: "Rating Added", rating: user.rating });
+
+  } catch (err) {
+    console.log(err);
+    res.status(500).json({ message: "Rating Error" });
+  }
+});
+
+
 // ================= GET ALL =================
 router.get("/all", async (req, res) => {
   try {
